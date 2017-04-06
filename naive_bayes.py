@@ -30,7 +30,7 @@ def selectTestData(sample_labels, sample_text, i):
 
 #== Read base data. ==#
 base_text = []; base_labels = []
-for line in codecs.open('base_data.tsv', 'r', 'utf-8'):
+for line in codecs.open('./data/base_data.tsv', 'r', 'utf-8'):
 	label, text = line.strip().split('\t')
 	text = ' '.join(konlpy_twitter.morphs(text))
 	base_text.append(text)
@@ -38,7 +38,7 @@ for line in codecs.open('base_data.tsv', 'r', 'utf-8'):
 
 #== Read sample emotion data for train and test. ==#
 sample_text = []; sample_labels = []
-for line in codecs.open('emotion_data.tsv', 'r', 'utf-8'):
+for line in codecs.open('./data/emotion_data.tsv', 'r', 'utf-8'):
 	label, text = line.strip().split('\t')
 	text = ' '.join(konlpy_twitter.morphs(text))
 	#print('%s : %s'%(label, text))
