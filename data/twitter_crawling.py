@@ -21,25 +21,35 @@ api = tweepy.API(auth)
 
 
 # Search by keyword.
-keyword = u"봄";
+keywords = [u"우와", u"기분", u"내일", u"너무", u"휴"]
+#[u"싫", u"대박", u"오", u"악", u"짱"]
+#[u"사랑" ,u"행복", u"우울", u"깜짝", u"헐"]
+#[u"ㅠㅠ", u"으으", u"제발", u"진짜", u"좋"]
 search = []
 
-cnt = 1
-while (cnt <= 10):
-	tweets = api.search(keyword)
-	for tweet in tweets:
-		search.append(tweet)
-	cnt += 1
-#print(search[0])
+for keyword in keywords:
+	cnt = 1
+	while (cnt <= 10):
+		tweets = api.search(keyword)
+		for tweet in tweets:
+			search.append(tweet)
+		cnt += 1
 
-wfile1 = open(os.getcwd() + "/crawling_data_keyword.tsv", mode='w')
+wfile1 = open(os.getcwd() + "/crawling_data.tsv", mode='a')
 data = {}
+data_list = []
 for tweet in search:
 	data['text'] = tweet.text
-	wfile1.write(data['text'].encode('utf-8') + '\n')
+	data_list.append(data['text'].encode('utf-8'))
+
+data_set = set(data_list)
+data_list = list(data_set)
+
+for elem in data_list:
+	wfile1.write(elem + '\n')
 wfile1.close()
 
-
+"""
 # Get data from timeline.
 wfile2 = open(os.getcwd() + "/crawling_data_timeline.tsv", mode='w')
 data = {}
@@ -48,7 +58,7 @@ for tweet in tweepy.Cursor(api.home_timeline).items(10):
 	wfile2.write(data['text'].encode('utf-8') + '\n')
 wfile2.close()
 
-"""
+
 for tweet in tweepy.Cursor(api.friends).items():
 for tweet in tweepy.Cursor(api.user_timeline).items():
 """

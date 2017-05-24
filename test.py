@@ -12,7 +12,7 @@ from sklearn.naive_bayes import MultinomialNB
 from sklearn import metrics
 
 
-def selectTestData(sample_labels, sample_text, i):
+def select_test_data(sample_labels, sample_text, i):
 	chunksize = len(sample_text)/5
 	start = chunksize * i;
 	if i == 4:
@@ -45,13 +45,13 @@ for line in codecs.open('./data/emotion_data.tsv', 'r', 'utf-8'):
 	sample_text.append(text)
 	sample_labels.append(label)
 
-total_acc = 0.0;
 #== 5-fold cross validation. ==#
+total_acc = 0.0;
 for i in range(0, 5):
 	print('\n===== TEST #%d =====\n' % (i+1))
 
 	#== Select test data from sample. ==#
-	test_labels, test_text, _labels, _text = selectTestData(sample_labels, sample_text, i)	
+	test_labels, test_text, _labels, _text = select_test_data(sample_labels, sample_text, i)	
 	
 	train_labels = base_labels + _labels
 	train_text = base_text + _text		
