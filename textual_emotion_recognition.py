@@ -64,7 +64,7 @@ vectorizers = [
 kernels = ['linear', 'rbf', 'poly']
 
 
-f = open('result.txt', 'w')
+f = open('result_with_base_data.txt', 'w')
 
 classifier_num = 0
 # 5-fold cross validation for each classifier.
@@ -84,6 +84,9 @@ for vec_name, vectorizer in vectorizers:
 	
 			train_labels = base_labels + _labels
 			train_text = base_text + _text		
+			#train_labels = _labels
+			#train_text = _text
+
 			test_text = [' '.join(konlpy_twitter.morphs(_)) for _ in test_text]
 			
 			trained_vectorizer = copy.deepcopy(vectorizer)
@@ -122,6 +125,6 @@ for vec_name, vectorizer in vectorizers:
 			trained_clf.classes_
 
 		#print('\n===== TEST END =====')
-		f.write('  - SVM ACCURACY AVERAGE: %.5f\n' % (svm_total_acc / 5))
-		f.write('  - NBC ACCURACY AVERAGE: %.5f\n\n' % (nbc_total_acc / 5))
+		f.write('  - SVM Accuracy Average: %.5f\n' % (svm_total_acc / 5))
+		f.write('  - NBC Accuracy Average: %.5f\n\n' % (nbc_total_acc / 5))
 
