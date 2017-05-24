@@ -11,6 +11,10 @@ from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.naive_bayes import MultinomialNB
 from sklearn import metrics
 
+from keras.models import Sequential
+from keras.layers import Dense, Dropout
+from keras.layers import Embedding
+from keras.layers import LSTM
 
 def select_test_data(sample_labels, sample_text, i):
 	chunksize = len(sample_text)/5
@@ -55,7 +59,18 @@ for i in range(0, 5):
 	
 	train_labels = base_labels + _labels
 	train_text = base_text + _text		
+
+	model = Sequential()
+	model.add(LSTM(128))
+	model.add(Dense(1, activation='sigmoid'))
+	model.compile(loss='binary_crossentropy',
+			      optimizer='rmsprop',
+				  metrics=['accuracy'])
+	model.fit(train_text, train_labels, batch_size=16, epochs=10)
+	score = model.evaluate(test_text, test_labels, batch_size=16)
 	
+	print(score)
+	"""
 	count_vect = CountVectorizer()
 	train_text_feat = count_vect.fit_transform(train_text)
 
@@ -93,4 +108,4 @@ for i in range(0, 5):
 
 print('\n===== TEST END =====')
 print('[ACCURACY AVERAGE] %.5f\n' % (total_acc/5))
-
+"""
