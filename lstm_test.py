@@ -62,8 +62,8 @@ for i in range(0, 5):
 
 	model = Sequential()
 	model.add(LSTM(128))
-	model.add(Dense(1, activation='sigmoid'))
-	model.compile(loss='binary_crossentropy',
+	model.add(Dense(7, activation='sigmoid'))
+	model.compile(loss='categorical_crossentropy',
 			      optimizer='rmsprop',
 				  metrics=['accuracy'])
 	model.fit(train_text, train_labels, batch_size=16, epochs=10)

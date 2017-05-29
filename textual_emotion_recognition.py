@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-
 import numpy as np
 import sys
 import codecs
@@ -32,6 +31,66 @@ def select_test_data(sample_labels, sample_text, i):
 	return (test_labels, test_text, train_labels, train_text)
 
 
+# 5-fold cross validation
+def five_fold_cross_validation(vec_name, vectorizer, kind, kernel, 
+		base_labels, base_text, sample_labels, sample_text, f):
+	if kind == 0:
+		exp_name = "%s" % (vec_name)
+	elif kind == 1:
+		exp_name = "%s - %s" % (vec_name, kernel)
+
+	f.write(' * ' + exp_name + ':	')
+		
+	total_acc = 0.0
+	for i in range(0, 5):
+		test_labels, test_text, _labels, _text = select_test_data(sample_labels, sample_text, i)	
+		
+		train_labels = base_labels + _labels
+		train_text = base_text + _text		
+		#train_labels = _labels
+		#train_text = _text
+		#train_labels = base_labels
+		#train_text = base_text
+
+		test_text = [' '.join(konlpy_twitter.morphs(_)) for _ in test_text]
+			
+		trained_vectorizer = copy.deepcopy(vectorizer)
+		train_text_feat = trained_vectorizer.fit_transform(train_text)
+		test_text_feat = trained_vectorizer.transform(test_text)
+
+		if kind == 0:
+			trained_clf = MultinomialNB().fit(train_text_feat, train_labels)
+		elif kind == 1:
+			trained_clf = svm.SVC(kernel=kernel).fit(train_text_feat, train_labels)
+			trained_clf.fit(train_text_feat, train_labels)
+		
+		if kind == 0:
+			print(trained_clf.classes_)
+			predicted_prob = trained_clf.predict_proba(test_text_feat)
+			print(predicted_prob)
+			#print('\n  -> Accuracy: %.5f\n' % (acc))
+	
+		predicted = trained_clf.predict(test_text_feat)
+		predicted[0] = 'hi'
+		
+		j = 0; correct = 0.0
+		for label in test_labels:
+			if predicted[j] == label:
+				#print('[CORRECT] ')
+				#if not 'joy' in predicted[j]:
+					#print('[CORRECT]  Predict: ' + predicted[j] + ',	Answer: ' + test_labels[j] +'  ' + _)
+				correct = correct + 1
+			#else:
+				#if not 'joy' in predicted[j]:
+					#print('[INCORRECT]Predict: ' + predicted[j] + ',	Answer: ' + test_labels[j] +'  ' + _)
+			j = j + 1
+		acc = correct / j
+		total_acc += acc
+
+	f.write('Accuracy avg: %.3f\n' % ((total_acc / 5) * 100))
+	return total_acc / 5
+
+
 # Read base data.
 base_text = []; base_labels = []
 for line in codecs.open('./data/base_data.tsv', 'r', 'utf-8'):
@@ -46,6 +105,7 @@ sample_text = []; sample_labels = []
 for line in codecs.open('./data/test_data.tsv', 'r', 'utf-8'):
 	label, text = line.strip().split('\t')
 	text = ' '.join(konlpy_twitter.morphs(text))
+
 	#print('%s : %s'%(label, text))
 	sample_text.append(text)
 	sample_labels.append(label)
@@ -64,67 +124,20 @@ vectorizers = [
 kernels = ['linear', 'rbf', 'poly']
 
 
-f = open('result_with_base_data.txt', 'w')
+# 5-fold cross validation for each classifier and write result file.
+f = open('result_with_base.txt', 'w')
 
-classifier_num = 0
-# 5-fold cross validation for each classifier.
+# NBC
+f.write('[NBC Classifier]\n')
+for vec_name, vectorizer in vectorizers:
+	five_fold_cross_validation(vec_name, vectorizer, 0, '-', 
+			base_labels, base_text, sample_labels, sample_text, f)
+# SVM
+f.write('\n[SVM Classifier]\n')
 for vec_name, vectorizer in vectorizers:
 	for kernel in kernels:
-		exp_name = "%s_%s"%(vec_name, kernel)
+		five_fold_cross_validation(vec_name, vectorizer, 1, kernel, 
+				base_labels, base_text, sample_labels, sample_text, f)
 
-		classifier_num = classifier_num + 1
-		f.write('%d) Classifier: ' % classifier_num + exp_name + '\n')
-		
-		svm_total_acc = 0.0
-		nbc_total_acc = 0.0
-		for i in range(0, 10):
-			n = i % 5
-			#print('===== TEST #%d =====\n'%(n+1))
-			test_labels, test_text, _labels, _text = select_test_data(sample_labels, sample_text, n)	
-	
-			train_labels = base_labels + _labels
-			train_text = base_text + _text		
-			#train_labels = _labels
-			#train_text = _text
-
-			test_text = [' '.join(konlpy_twitter.morphs(_)) for _ in test_text]
-			
-			trained_vectorizer = copy.deepcopy(vectorizer)
-			train_text_feat = trained_vectorizer.fit_transform(train_text)
-			test_text_feat = trained_vectorizer.transform(test_text)
-
-			if i < 5:
-				trained_clf = svm.SVC(kernel=kernel).fit(train_text_feat, train_labels)
-				trained_clf.fit(train_text_feat, train_labels)
-			else:
-				trained_clf = MultinomialNB().fit(train_text_feat, train_labels)
-		
-			predicted = trained_clf.predict(test_text_feat)
-	
-			j = 0; correct = 0.0
-			for _ in test_text:
-				if predicted[j] == test_labels[j]:
-					#print('[CORRECT] ')
-					correct = correct + 1
-				#else:
-					#print('[INCORRECT] ')
-				#print('    * Predicted: ' + predicted[i] + ',  * Expected: ' + test_labels[i])
-				#print('  ' + _)
-				j = j + 1
-			acc = correct / j
-
-			if i < 5:
-				svm_total_acc += acc
-			else:
-				nbc_total_acc += acc
-			#print('\n  -> Accuracy: %.5f\n' % (acc))
-
-			#predicted = trained_clf.predict_proba(test_text_feat)
-			#print(predicted)
-
-			trained_clf.classes_
-
-		#print('\n===== TEST END =====')
-		f.write('  - SVM Accuracy Average: %.5f\n' % (svm_total_acc / 5))
-		f.write('  - NBC Accuracy Average: %.5f\n\n' % (nbc_total_acc / 5))
+f.close()
 
