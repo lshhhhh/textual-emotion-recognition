@@ -4,7 +4,9 @@ import sys
 import codecs
 
 from konlpy.tag import Twitter
+from konlpy.tag import Kkma
 konlpy_twitter = Twitter()
+kkma = Kkma()
 
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.naive_bayes import MultinomialNB

@@ -52,7 +52,7 @@ def five_fold_cross_validation(vec_name, vectorizer, kind, kernel,
 		#train_labels = base_labels
 		#train_text = base_text
 
-		test_text = [' '.join(konlpy_twitter.morphs(_)) for _ in test_text]
+		test_text = [' '.join(word[0] for word in konlpy_twitter.pos(text, norm=True)) for text in test_text]
 			
 		trained_vectorizer = copy.deepcopy(vectorizer)
 		train_text_feat = trained_vectorizer.fit_transform(train_text)
@@ -95,7 +95,7 @@ def five_fold_cross_validation(vec_name, vectorizer, kind, kernel,
 base_text = []; base_labels = []
 for line in codecs.open('./data/base_data.tsv', 'r', 'utf-8'):
 	label, text = line.strip().split('\t')
-	text = ' '.join(konlpy_twitter.morphs(text))
+	text = ' '.join(word[0] for word in konlpy_twitter.pos(text, norm=True))
 	base_text.append(text)
 	base_labels.append(label)
 
@@ -104,7 +104,7 @@ for line in codecs.open('./data/base_data.tsv', 'r', 'utf-8'):
 sample_text = []; sample_labels = []
 for line in codecs.open('./data/test_data.tsv', 'r', 'utf-8'):
 	label, text = line.strip().split('\t')
-	text = ' '.join(konlpy_twitter.morphs(text))
+	text = ' '.join(word[0] for word in konlpy_twitter.pos(text, norm=True))
 
 	#print('%s : %s'%(label, text))
 	sample_text.append(text)
@@ -125,7 +125,7 @@ kernels = ['linear', 'rbf', 'poly']
 
 
 # 5-fold cross validation for each classifier and write result file.
-f = open('result_with_base.txt', 'w')
+f = open('result.txt', 'w')
 
 # NBC
 f.write('[NBC Classifier]\n')
