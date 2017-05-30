@@ -16,20 +16,18 @@ from sklearn import metrics
 
 # Select test data from sample data for 5-fold cross validation.
 def select_test_data(sample_labels, sample_text, i):
-	chunksize = len(sample_text) / 5
-	start = chunksize * i;
+	chunk_size = len(sample_text) / 5
+	start = chunk_size * i;
 	if i == 4:
 		end = len(sample_text)
 	else:
-		end = start + chunksize
+		end = start + chunk_size
 
 	test_labels = sample_labels[start:end]
 	test_text = sample_text[start:end]
 	train_labels = sample_labels[:start] + sample_labels[end:]
 	train_text = sample_text[:start] + sample_text[end:]
-
 	return (test_labels, test_text, train_labels, train_text)
-
 
 # 5-fold cross validation
 def five_fold_cross_validation(vec_name, vectorizer, kind, kernel, 
@@ -99,7 +97,6 @@ for line in codecs.open('./data/base_data.tsv', 'r', 'utf-8'):
 	base_text.append(text)
 	base_labels.append(label)
 
-
 # Read sample emotion data for train and test.
 sample_text = []; sample_labels = []
 for line in codecs.open('./data/test_data.tsv', 'r', 'utf-8'):
@@ -110,7 +107,6 @@ for line in codecs.open('./data/test_data.tsv', 'r', 'utf-8'):
 	sample_text.append(text)
 	sample_labels.append(label)
 
-
 # Make vectorizers and kernels.
 vectorizers = [
 	('freq-1gram', CountVectorizer(ngram_range=(1, 1))),
@@ -120,13 +116,10 @@ vectorizers = [
 	('tfidf-2gram', TfidfVectorizer(ngram_range=(1, 2))),
 	('tfidf-3gram', TfidfVectorizer(ngram_range=(1, 3)))
 ]
-
 kernels = ['linear', 'rbf', 'poly']
-
 
 # 5-fold cross validation for each classifier and write result file.
 f = open('result.txt', 'w')
-
 # NBC
 f.write('[NBC Classifier]\n')
 for vec_name, vectorizer in vectorizers:
@@ -140,4 +133,3 @@ for vec_name, vectorizer in vectorizers:
 				base_labels, base_text, sample_labels, sample_text, f)
 
 f.close()
-

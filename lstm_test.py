@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-
 import numpy as np
 import sys
 import codecs
@@ -16,23 +15,58 @@ from keras.layers import Dense, Dropout
 from keras.layers import Embedding
 from keras.layers import LSTM
 
+
+# Select test data from sample data for 5-fold cross validation.
 def select_test_data(sample_labels, sample_text, i):
-	chunksize = len(sample_text)/5
-	start = chunksize * i;
+	chunk_size = len(sample_text) / 5
+	start = int(chunk_size * i);
 	if i == 4:
 		end = len(sample_text)
 	else:
-		end = start + chunksize
+		end = int(start + chunk_size)
 
 	test_labels = sample_labels[start:end]
 	test_text = sample_text[start:end]
 	train_labels = sample_labels[:start] + sample_labels[end:]
 	train_text = sample_text[:start] + sample_text[end:]
-
 	return (test_labels, test_text, train_labels, train_text)
 
+# Make (text, index) dictionary.
+def make_text_index_dic(_text):
+	word_set = set()
+	for text in _text:
+		for word in text:
+			word_set.add(word)
 
-#== Read base data. ==#
+	word_dic = {}
+	i = 0
+	for word in word_set:
+		word_dic.update({word:i})
+		i = i + 1
+	return word_dic
+
+# Map text list to index list.
+def map_text_to_index(_text, _dic):
+	x_index = []
+	x_element = []
+	for text in _text:
+		for word in text:
+			x_element.append(_dic.get(word))
+		np.array(x_element, dtype=np.int)
+		x_index.append(x_element)
+		x_element = []
+	return x_index
+
+# Map label list to index list.
+def map_label_to_index(_labels):
+	label_dic = {'joy':0, 'love':1, 'sadness':2, 'surprise':3, 'anger':4, 'fear':5, 'neutral':6}
+	y_index = []
+	for label in _labels:
+		y_index.append(label_dic[label])
+	return np.array(y_index, dtype=np.int)
+
+
+# Read base data.
 base_text = []; base_labels = []
 for line in codecs.open('./data/base_data.tsv', 'r', 'utf-8'):
 	label, text = line.strip().split('\t')
@@ -40,72 +74,43 @@ for line in codecs.open('./data/base_data.tsv', 'r', 'utf-8'):
 	base_text.append(text)
 	base_labels.append(label)
 
-#== Read sample emotion data for train and test. ==#
+# Read sample emotion data for train and test.
 sample_text = []; sample_labels = []
-for line in codecs.open('./data/emotion_data.tsv', 'r', 'utf-8'):
+for line in codecs.open('./data/ex_data.tsv', 'r', 'utf-8'):
 	label, text = line.strip().split('\t')
 	text = ' '.join(konlpy_twitter.morphs(text))
 	#print('%s : %s'%(label, text))
 	sample_text.append(text)
 	sample_labels.append(label)
 
-#== 5-fold cross validation. ==#
+# 5-fold cross validation.
+max_features = 128
 total_acc = 0.0;
 for i in range(0, 5):
 	print('\n===== TEST #%d =====\n' % (i+1))
-
-	#== Select test data from sample. ==#
 	test_labels, test_text, _labels, _text = select_test_data(sample_labels, sample_text, i)	
-	
 	train_labels = base_labels + _labels
-	train_text = base_text + _text		
+	train_text = base_text + _text
+
+	text_index_dic = make_text_index_dic(train_text + test_text)
+	x_train = map_text_to_index(train_text, text_index_dic)
+	y_train = map_label_to_index(train_labels)
+	x_test = map_text_to_index(test_text, text_index_dic)
+	y_test = map_label_to_index(test_labels)
 
 	model = Sequential()
+	model.add(Embedding(max_features, output_dim=256))
 	model.add(LSTM(128))
+	model.add(Dropout(0.5))
 	model.add(Dense(7, activation='sigmoid'))
-	model.compile(loss='categorical_crossentropy',
-			      optimizer='rmsprop',
-				  metrics=['accuracy'])
-	model.fit(train_text, train_labels, batch_size=16, epochs=10)
-	score = model.evaluate(test_text, test_labels, batch_size=16)
+	model.compile(loss='sparse_categorical_crossentropy', 
+					optimizer='rmsprop',
+		      		metrics=['accuracy'])
+	model.fit(x_train, y_train, batch_size=16, epochs=10)
+
+	score, acc = model.evaluate(x_test, y_test, batch_size=16)
+	print('Score: ', score)
+	print('Accuracy: ', acc)
+	print(model.metrics_names)
+	print('-- done')
 	
-	print(score)
-	"""
-	count_vect = CountVectorizer()
-	train_text_feat = count_vect.fit_transform(train_text)
-
-	#for word in count_vect.vocabulary_:
-		#print('%s => %s'%(word, count_vect.vocabulary_[word]))
-	#print(train_text_feat)
-
-	clf = MultinomialNB().fit(train_text_feat, train_labels)
-
-	test_text = [' '.join(konlpy_twitter.morphs(_)) for _ in test_text]
-
-
-	test_text_feat = count_vect.transform(test_text)
-	#print(test_text_feat)
-
-	predicted = clf.predict(test_text_feat)
-	i = 0; correct = 0.0
-	for _ in test_text:
-		if predicted[i] == test_labels[i]:
-			print('[CORRECT] ')
-			correct = correct + 1
-		else:
-			print('[INCORRECT] ')
-		print('    * Predicted: ' + predicted[i] + ',  * Expected: ' + test_labels[i])
-		print('  ' + _)
-		i = i+1;
-	acc = correct / i
-	total_acc = total_acc + acc
-	print('\n  -> Accuracy: %.5f\n' % (acc))
-
-	predicted = clf.predict_proba(test_text_feat)
-	print(predicted)
-
-	clf.classes_
-
-print('\n===== TEST END =====')
-print('[ACCURACY AVERAGE] %.5f\n' % (total_acc/5))
-"""
