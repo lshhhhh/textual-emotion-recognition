@@ -21,7 +21,7 @@ def select_test_data(sample_labels, sample_text, i):
 	if i == 4:
 		end = len(sample_text)
 	else:
-		end = start + chunk_size
+		end = int(start + chunk_size)
 
 	test_labels = sample_labels[start:end]
 	test_text = sample_text[start:end]
@@ -29,11 +29,11 @@ def select_test_data(sample_labels, sample_text, i):
 	train_text = sample_text[:start] + sample_text[end:]
 	return (test_labels, test_text, train_labels, train_text)
 
-# 5-fold cross validation
+# 5-fold cross validation.
 def five_fold_cross_validation(vec_name, vectorizer, kind, kernel, 
 		base_labels, base_text, sample_labels, sample_text, f):
 	if kind == 0:
-		exp_name = "%s" % (vec_name)
+		exp_name = vec_name
 	elif kind == 1:
 		exp_name = "%s - %s" % (vec_name, kernel)
 
@@ -131,5 +131,4 @@ for vec_name, vectorizer in vectorizers:
 	for kernel in kernels:
 		five_fold_cross_validation(vec_name, vectorizer, 1, kernel, 
 				base_labels, base_text, sample_labels, sample_text, f)
-
 f.close()

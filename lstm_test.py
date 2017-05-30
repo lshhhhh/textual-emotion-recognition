@@ -85,7 +85,7 @@ for line in codecs.open('./data/ex_data.tsv', 'r', 'utf-8'):
 
 # 5-fold cross validation.
 max_features = 128
-total_acc = 0.0;
+total_acc = 0.0
 for i in range(0, 5):
 	print('\n===== TEST #%d =====\n' % (i+1))
 	test_labels, test_text, _labels, _text = select_test_data(sample_labels, sample_text, i)	
@@ -104,13 +104,15 @@ for i in range(0, 5):
 	model.add(Dropout(0.5))
 	model.add(Dense(7, activation='sigmoid'))
 	model.compile(loss='sparse_categorical_crossentropy', 
-					optimizer='rmsprop',
-		      		metrics=['accuracy'])
+			optimizer='rmsprop',
+			metrics=['accuracy'])
 	model.fit(x_train, y_train, batch_size=16, epochs=10)
 
 	score, acc = model.evaluate(x_test, y_test, batch_size=16)
 	print('Score: ', score)
 	print('Accuracy: ', acc)
 	print(model.metrics_names)
-	print('-- done')
-	
+	total_acc += acc
+
+total_acc /= 5
+print('Total Accuracy: ', total_acc)	
