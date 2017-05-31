@@ -51,6 +51,8 @@ def five_fold_cross_validation(vec_name, vectorizer, kind, kernel,
 		#train_text = base_text
 
 		test_text = [' '.join(word[0] for word in konlpy_twitter.pos(text, norm=True)) for text in test_text]
+		#test_text = [' '.join(konlpy_twitter.morphs(text)) for text in test_text]
+		#test_text = [' '.join(konlpy_twitter.nouns(text)) for text in test_text]
 			
 		trained_vectorizer = copy.deepcopy(vectorizer)
 		train_text_feat = trained_vectorizer.fit_transform(train_text)
@@ -63,9 +65,9 @@ def five_fold_cross_validation(vec_name, vectorizer, kind, kernel,
 			trained_clf.fit(train_text_feat, train_labels)
 		
 		if kind == 0:
-			print(trained_clf.classes_)
+			#print(trained_clf.classes_)
 			predicted_prob = trained_clf.predict_proba(test_text_feat)
-			print(predicted_prob)
+			#print(predicted_prob)
 			#print('\n  -> Accuracy: %.5f\n' % (acc))
 	
 		predicted = trained_clf.predict(test_text_feat)
@@ -74,13 +76,7 @@ def five_fold_cross_validation(vec_name, vectorizer, kind, kernel,
 		j = 0; correct = 0.0
 		for label in test_labels:
 			if predicted[j] == label:
-				#print('[CORRECT] ')
-				#if not 'joy' in predicted[j]:
-					#print('[CORRECT]  Predict: ' + predicted[j] + ',	Answer: ' + test_labels[j] +'  ' + _)
 				correct = correct + 1
-			#else:
-				#if not 'joy' in predicted[j]:
-					#print('[INCORRECT]Predict: ' + predicted[j] + ',	Answer: ' + test_labels[j] +'  ' + _)
 			j = j + 1
 		acc = correct / j
 		total_acc += acc
@@ -94,6 +90,9 @@ base_text = []; base_labels = []
 for line in codecs.open('./data/base_data.tsv', 'r', 'utf-8'):
 	label, text = line.strip().split('\t')
 	text = ' '.join(word[0] for word in konlpy_twitter.pos(text, norm=True))
+	#test_text = ' '.join(konlpy_twitter.morphs(text))
+	#test_text = ' '.join(konlpy_twitter.nouns(text))
+
 	base_text.append(text)
 	base_labels.append(label)
 
@@ -101,8 +100,9 @@ for line in codecs.open('./data/base_data.tsv', 'r', 'utf-8'):
 sample_text = []; sample_labels = []
 for line in codecs.open('./data/test_data.tsv', 'r', 'utf-8'):
 	label, text = line.strip().split('\t')
-	print(text)
 	text = ' '.join(word[0] for word in konlpy_twitter.pos(text, norm=True))
+	#test_text = ' '.join(konlpy_twitter.morphs(text))
+	#test_text = ' '.join(konlpy_twitter.nouns(text))
 
 	#print('%s : %s'%(label, text))
 	sample_text.append(text)

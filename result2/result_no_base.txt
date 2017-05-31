@@ -1,0 +1,27 @@
+[NBC Classifier]
+ * freq-1gram:	Accuracy avg: 52.977
+ * freq-2gram:	Accuracy avg: 50.818
+ * freq-3gram:	Accuracy avg: 50.530
+ * tfidf-1gram:	Accuracy avg: 45.476
+ * tfidf-2gram:	Accuracy avg: 44.535
+ * tfidf-3gram:	Accuracy avg: 44.318
+
+[SVM Classifier]
+ * freq-1gram - linear:	Accuracy avg: 49.580
+ * freq-1gram - rbf:	Accuracy avg: 43.020
+ * freq-1gram - poly:	Accuracy avg: 43.020
+ * freq-2gram - linear:	Accuracy avg: 48.059
+ * freq-2gram - rbf:	Accuracy avg: 43.020
+ * freq-2gram - poly:	Accuracy avg: 43.020
+ * freq-3gram - linear:	Accuracy avg: 46.687
+ * freq-3gram - rbf:	Accuracy avg: 43.020
+ * freq-3gram - poly:	Accuracy avg: 43.020
+ * tfidf-1gram - linear:	Accuracy avg: 54.144
+ * tfidf-1gram - rbf:	Accuracy avg: 43.020
+ * tfidf-1gram - poly:	Accuracy avg: 43.020
+ * tfidf-2gram - linear:	Accuracy avg: 53.709
+ * tfidf-2gram - rbf:	Accuracy avg: 43.020
+ * tfidf-2gram - poly:	Accuracy avg: 43.020
+ * tfidf-3gram - linear:	Accuracy avg: 52.694
+ * tfidf-3gram - rbf:	Accuracy avg: 43.020
+ * tfidf-3gram - poly:	Accuracy avg: 43.020
