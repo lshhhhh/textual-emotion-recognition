@@ -14,13 +14,13 @@ from sklearn import metrics
 
 # Read base data.
 train_text = []; train_labels = []
-for line in codecs.open('/base_data.tsv', 'r', 'utf-8'):
+for line in codecs.open('./base_data.tsv', 'r', 'utf-8'):
 	label, text = line.strip().split('\t')
 	text = ' '.join(konlpy_twitter.morphs(text))
 	train_text.append(text)
 	train_labels.append(label)
 
-for line in codecs.open('/test_data.tsv', 'r', 'utf-8'):
+for line in codecs.open('./test_data.tsv', 'r', 'utf-8'):
 	label, text = line.strip().split('\t')
 	text = ' '.join(konlpy_twitter.morphs(text))
 	train_text.append(text)
@@ -30,7 +30,7 @@ for line in codecs.open('/test_data.tsv', 'r', 'utf-8'):
 # Read sample emotion data for test.
 origin_text = []
 test_text = []; test_labels = []
-for line in codecs.open('/crawling_data.tsv', 'r', 'utf-8'):
+for line in codecs.open('./crawling_data.tsv', 'r', 'utf-8'):
 	origin_text.append(line)
 	text = ' '.join(konlpy_twitter.morphs(line))
 	test_text.append(text)
@@ -48,7 +48,7 @@ test_labels = clf.predict(test_text_feat)
 
 
 # Make emotion matching file.
-f = codecs.open('/test_data.tsv', 'a', 'utf-8')
+f = codecs.open('./test_data.tsv', 'a', 'utf-8')
 file_contents = [];
 for i in range(0, len(test_labels)):
 	file_contents.append(test_labels[i] + '\t' + origin_text[i])

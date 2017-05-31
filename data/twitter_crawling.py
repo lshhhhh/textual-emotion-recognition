@@ -21,10 +21,10 @@ api = tweepy.API(auth)
 
 
 # Search by keyword.
-keywords = [u"우와", u"기분", u"내일", u"너무", u"휴"]
-#[u"싫", u"대박", u"오", u"악", u"짱"]
-#[u"사랑" ,u"행복", u"우울", u"깜짝", u"헐"]
-#[u"ㅠㅠ", u"으으", u"제발", u"진짜", u"좋"]
+keywords = [u"ㅠㅠ", u"으으", u"제발", u"진짜", u"좋"]
+#[u"짜증", u"화", u"흑흑", u"재미", u"정말"]
+#[u"싫", u"대박", u"오", u"악", u"짱"][u"사랑" ,u"행복", u"우울", u"깜짝", u"헐"]
+
 search = []
 
 for keyword in keywords:
