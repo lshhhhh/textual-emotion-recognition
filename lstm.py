@@ -88,7 +88,7 @@ for line in codecs.open('./data/base_data.tsv', 'r', 'utf-8'):
 
 # Read sample emotion data for train and test.
 sample_text = []; sample_labels = []
-for line in codecs.open('./data/ex_data.tsv', 'r', 'utf-8'):
+for line in codecs.open('./data/test_data.tsv', 'r', 'utf-8'):
 	label, text = line.strip().split('\t')
 	text = ' '.join(word[0] for word in konlpy_twitter.pos(text, norm=True))
 	#print('%s : %s'%(label, text))
@@ -96,7 +96,7 @@ for line in codecs.open('./data/ex_data.tsv', 'r', 'utf-8'):
 	sample_labels.append(label)
 
 f = open('result.txt', 'w')
-f.write('[RNN]\n')
+f.write('[LSTM]\n')
 # 5-fold cross validation.
 max_features = 128
 total_acc = 0.0
