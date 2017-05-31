@@ -101,6 +101,7 @@ for line in codecs.open('./data/base_data.tsv', 'r', 'utf-8'):
 sample_text = []; sample_labels = []
 for line in codecs.open('./data/test_data.tsv', 'r', 'utf-8'):
 	label, text = line.strip().split('\t')
+	print(text)
 	text = ' '.join(word[0] for word in konlpy_twitter.pos(text, norm=True))
 
 	#print('%s : %s'%(label, text))
