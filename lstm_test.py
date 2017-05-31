@@ -88,19 +88,22 @@ for line in codecs.open('./data/base_data.tsv', 'r', 'utf-8'):
 
 # Read sample emotion data for train and test.
 sample_text = []; sample_labels = []
-for line in codecs.open('./data/test_data.tsv', 'r', 'utf-8'):
+for line in codecs.open('./data/ex_data.tsv', 'r', 'utf-8'):
 	label, text = line.strip().split('\t')
 	text = ' '.join(word[0] for word in konlpy_twitter.pos(text, norm=True))
 	#print('%s : %s'%(label, text))
 	sample_text.append(text)
 	sample_labels.append(label)
 
+f = open('result.txt', 'w')
+f.write('[RNN]\n')
 # 5-fold cross validation.
 max_features = 128
 total_acc = 0.0
 MAX_RNN_LEN = 50 #EDIT
 for i in range(0, 5):
-	print('\n===== TEST #%d =====\n' % (i+1))
+	f.write('TEST #%d)\n' % (i+1))
+	print('====== TEST #%d =====\n' % (i+1))
 	test_labels, test_text, _labels, _text = select_test_data(sample_labels, sample_text, i)	
 	train_labels = base_labels + _labels
 	train_text = base_text + _text
@@ -126,19 +129,16 @@ for i in range(0, 5):
 	print('Done')
 
 	# Edit (following)
-	#score, acc = model.evaluate(x_test, y_test, batch_size=32)
 	y_pred = model.predict(x_test)
 	y_pred = [np.argmax(_) for _ in y_pred]
 	y_true = [np.argmax(_) for _ in y_test]
-	print('Prediction =',y_pred)
-	print('True =', y_true)	
+	f.write(' - Prediction = ' + str(y_pred) + '\n')
+	f.write(' - True = ' + str(y_true) + '\n')	
 	accuracy = np.average([y_pred[i] == y_true[i] for i in range(len(y_pred))])
-	print('Accuracy =', accuracy)
+	f.write(' - Accuracy = ' + str(accuracy) + '\n')
 	
-	# print('Score: ', score)
-	# print('Accuracy: ', acc)
-	# print(model.metrics_names)
 	total_acc += accuracy
 
 total_acc /= 5
-print('Total Accuracy: ', total_acc)	
+f.write('\n* Total Accuracy = ' + str(total_acc))	
+f.close()

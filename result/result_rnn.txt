@@ -1,0 +1,23 @@
+[RNN]
+TEST #1)
+ - Prediction = [0, 0]
+ - True = [0, 2]
+ - Accuracy = 0.5
+TEST #2)
+ - Prediction = [4, 4]
+ - True = [0, 0]
+ - Accuracy = 0.0
+TEST #3)
+ - Prediction = [0, 0]
+ - True = [1, 5]
+ - Accuracy = 0.0
+TEST #4)
+ - Prediction = [0, 0]
+ - True = [4, 4]
+ - Accuracy = 0.0
+TEST #5)
+ - Prediction = [2, 4]
+ - True = [2, 0]
+ - Accuracy = 0.5
+
+* Total Accuracy = 0.2
