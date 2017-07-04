@@ -14,7 +14,7 @@ from keras.models import Sequential
 from keras.layers import Dense, Dropout, Activation
 from keras.layers import Embedding
 from keras.layers import LSTM
-from keras.preprocessing import sequence #EDIT
+from keras.preprocessing import sequence
 
 
 # Select test data from sample data for 5-fold cross validation.
@@ -39,8 +39,8 @@ def make_text_index_dic(_text):
 		for word in text:
 			word_set.add(word)
 
-	word_dic = {'UNK_WORD':0}#Edit
-	i = 1 #EDIT
+	word_dic = {'UNK_WORD':0}
+	i = 1
 	for word in word_set:
 		word_dic.update({word:i})
 		i = i + 1
@@ -52,20 +52,18 @@ def map_text_to_index(_text, _dic, max_rnn_len):
 	x_element = []
 	for text in _text:
 		for word in text:
-			if word in _dic:	#Edit
-				x_element.append(_dic.get(word))	#Edit
+			if word in _dic:
+				x_element.append(_dic.get(word))
 			else:
-				x_element.append(_dic.get('UNK_WORD'))	#Edit
-		#np.array(x_element, dtype=np.int)
+				x_element.append(_dic.get('UNK_WORD'))
 		x_index.append(x_element)
 		x_element = []
-	x_index = sequence.pad_sequences(x_index, maxlen=max_rnn_len) #EDIT
+	x_index = sequence.pad_sequences(x_index, maxlen=max_rnn_len)
 	return x_index
 
 # Map label list to index list.
 def map_label_to_index(_labels):
-	#label_dic = {'joy':0, 'love':1, 'sadness':2, 'surprise':3, 'anger':4, 'fear':5, 'neutral':6}
-	label_dic = {#EDIT
+	label_dic = {
 		'joy'     :[1,0,0,0,0,0,0],
 		'love'    :[0,1,0,0,0,0,0],
 		'sadness' :[0,0,1,0,0,0,0],
@@ -97,10 +95,12 @@ for line in codecs.open('./data/test_data.tsv', 'r', 'utf-8'):
 
 f = open('result.txt', 'w')
 f.write('[LSTM]\n')
-# 5-fold cross validation.
+
 max_features = 128
+MAX_RNN_LEN = 50
+
+# 5-fold cross validation.
 total_acc = 0.0
-MAX_RNN_LEN = 50 #EDIT
 for i in range(0, 5):
 	f.write('TEST #%d)\n' % (i+1))
 	print('====== TEST #%d =====\n' % (i+1))
@@ -109,26 +109,25 @@ for i in range(0, 5):
 	train_text = base_text + _text
 
 	text_index_dic = make_text_index_dic(train_text + test_text)
-	x_train = map_text_to_index(train_text, text_index_dic, MAX_RNN_LEN) #EDIT
+	x_train = map_text_to_index(train_text, text_index_dic, MAX_RNN_LEN)
 	y_train = map_label_to_index(train_labels)
-	x_test = map_text_to_index(test_text, text_index_dic, MAX_RNN_LEN) #EDIT
+	x_test = map_text_to_index(test_text, text_index_dic, MAX_RNN_LEN)
 	y_test = map_label_to_index(test_labels)
 	
 	model = Sequential()
-	model.add(Embedding(len(text_index_dic), output_dim=128, input_length=MAX_RNN_LEN, mask_zero=True)) #EDIT
+	model.add(Embedding(len(text_index_dic), output_dim=128, input_length=MAX_RNN_LEN, mask_zero=True))
 	model.add(LSTM(128))
 	#model.add(Dropout(0.5))
-	model.add(Dense(7)) #EDIT
-	model.add(Activation('softmax')) #EDIT
+	model.add(Dense(7))
+	model.add(Activation('softmax'))
 	model.compile(loss='categorical_crossentropy', 
-			optimizer='adam', #EDIT
+			optimizer='adam',
 			metrics=['accuracy'])
             
 	print('Fitting...')
-	model.fit(x_train, y_train, batch_size=32, epochs=5) #EDIT
+	model.fit(x_train, y_train, batch_size=32, epochs=5)
 	print('Done')
 
-	# Edit (following)
 	y_pred = model.predict(x_test)
 	y_pred = [np.argmax(_) for _ in y_pred]
 	y_true = [np.argmax(_) for _ in y_test]
